@@ -188,75 +188,74 @@ public function getUserInfo(Request $request)
         return response()->json(['countRdv' => $count], 200);
     }
     public function rechercher(Request $request)
-    {
-        $search = $request->input('search');
-        $professionFilter = $request->input('profession');
-    
-        $query = Profession::leftJoin('emplois', 'professions.id', '=', 'emplois.profession_id')
-            ->select(
-                'professions.id',
-                'professions.nom',
-                'professions.prenom',
-                'professions.adresse_email',
-                'professions.entreprise_cabinet',
-                'professions.site_web',
-                'professions.domaine_expertise',
-                'professions.date_debut_exercice',
-                'professions.education_formation',
-                'professions.profession',
-                'professions.telephone',
-                'professions.description',
-                'professions.photo',
-            )
-            ->whereNotNull('professions.nom')
-            ->whereNotNull('professions.adresse')
-            ->distinct('professions.id');
-    
-        // Appliquez les filtres de recherche si fournis
-        if (!empty($search)) {
-            $query->where(function ($innerQuery) use ($search) {
-                $innerQuery->where('professions.nom', 'like', '%' . $search . '%')
-                    ->orWhere('professions.adresse', 'like', '%' . $search . '%')
-                    ->orWhere('professions.entreprise_cabinet', 'like', '%' . $search . '%');
-            });
-        }
-    
-        if (!empty($professionFilter)) {
-            $query->where('professions.profession', $professionFilter);
-        }
-    
-        try {
-            // Exécutez la requête
-            $professions = $query->get();
-    
-            // Encodez les images en Base64
-            // Ajoutez ces logs pour vérifier la clé photo_base64 côté Laravel
-            foreach ($professions as $profession) {
-                $photoFileName = $profession->photo;
-                $photoPath = public_path($photoFileName);
+{
+    $search = $request->input('search');
+    $professionFilter = $request->input('profession');
 
-                if ($photoPath !== false && is_file($photoPath)) {
-                    $base64Image = base64_encode(file_get_contents($photoPath));
-                    $profession->photo_base64 = $base64Image;
-                    \Log::info('Image encoded: ' . $photoPath);
-                } else {
-                    \Log::error('Image not found or is a directory: ' . $photoPath);
-                }
-            }
-            
-            
-            
-                        
-            // Retournez les résultats en tant que réponse JSON
-            return response()->json(['professions' => $professions], 200);
-        } catch (\Exception $e) {
-            // Log de l'exception
-            \Log::error('Error in rechercher: ' . $e->getMessage());
-    
-            // Retourner une réponse d'erreur
-            return response()->json(['error' => 'Erreur lors de la recherche des professions.'], 500);
-        }
+    $query = Profession::leftJoin('emplois', 'professions.id', '=', 'emplois.profession_id')
+        ->leftJoin('rdv', 'rdv.profession_id', '=', 'professions.id')
+        ->select(
+            'professions.id',
+            'professions.nom',
+            'professions.prenom',
+            'professions.adresse_email',
+            'professions.entreprise_cabinet',
+            'professions.site_web',
+            'professions.domaine_expertise',
+            'professions.date_debut_exercice',
+            'professions.education_formation',
+            'professions.profession',
+            'professions.telephone',
+            'professions.description',
+            'professions.photo',
+            DB::raw('COALESCE(AVG(rdv.note), 0) as moyenne_notes')
+        )
+        ->whereNotNull('professions.nom')
+        ->whereNotNull('professions.adresse')
+        ->groupBy('professions.id');
+
+    // Appliquez les filtres de recherche si fournis
+    if (!empty($search)) {
+        $query->where(function ($innerQuery) use ($search) {
+            $innerQuery->where('professions.nom', 'like', '%' . $search . '%')
+                ->orWhere('professions.adresse', 'like', '%' . $search . '%')
+                ->orWhere('professions.entreprise_cabinet', 'like', '%' . $search . '%');
+        });
     }
+
+    if (!empty($professionFilter)) {
+        $query->where('professions.profession', $professionFilter);
+    }
+
+    try {
+        // Exécutez la requête
+        $professions = $query->get();
+
+        // Encodez les images en Base64
+        foreach ($professions as $profession) {
+            $photoFileName = $profession->photo;
+            $photoPath = public_path($photoFileName);
+
+            if ($photoPath !== false && is_file($photoPath)) {
+                $base64Image = base64_encode(file_get_contents($photoPath));
+                $profession->photo_base64 = $base64Image;
+                \Log::info('Image encoded: ' . $photoPath);
+            } else {
+                \Log::error('Image not found or is a directory: ' . $photoPath);
+            }
+        }
+
+        // Retournez les résultats en tant que réponse JSON
+        return response()->json(['professions' => $professions], 200);
+    } catch (\Exception $e) {
+        // Log de l'exception
+        \Log::error('Error in rechercher: ' . $e->getMessage());
+
+        // Retourner une réponse d'erreur
+        return response()->json(['error' => 'Erreur lors de la recherche des professions.'], 500);
+    }
+}
+
 
     public function getCreneauxHoraires($professionId)
     {
