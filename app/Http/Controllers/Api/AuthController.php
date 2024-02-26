@@ -187,6 +187,8 @@ public function getUserInfo(Request $request)
 
         return response()->json(['countRdv' => $count], 200);
     }
+
+    
     public function rechercher(Request $request)
 {
     $search = $request->input('search');
