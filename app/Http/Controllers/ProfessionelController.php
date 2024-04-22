@@ -219,6 +219,19 @@ class ProfessionelController extends Controller
     return redirect()->back()->with('success', 'Emploi sauvegardé avec succès.');
 }
 
+public function supprimerEvenement($id)
+{
+    // Trouver l'événement dans la base de données
+    $emploi = Emploi::findOrFail($id);
+
+    // Supprimer l'événement
+    $emploi->delete();
+
+    // Retourner une réponse appropriée, par exemple une réponse JSON
+    return response()->json(['message' => 'Événement supprimé avec succès']);
+}
+
+
 
      public function update_profilP(Request $request)
     {
@@ -373,11 +386,42 @@ class ProfessionelController extends Controller
         return view('professionnel.clientsP', compact('professionnel', 'rdvs'));
     }
 
-    public function suiviP() {
+    public function recherche_client_professionnel(Request $request) {
         $professionnel = Profession::findOrFail(auth('professionnel')->user()->id);
+
+        $date_debut = $request->input('date_debut');
+        $date_fin = $request->input('date_fin');
     
         // Vous devez exécuter une requête pour obtenir les visiteurs associés à ce professionnel
         $rdvs = RDV::where('profession_id', $professionnel->id)
+                    ->whereBetween('rdv.created_at', [$date_debut, $date_fin])
+                    ->with('visiteur')
+                    ->get(); // Utilisez get() pour récupérer les résultats
+    
+        return view('professionnel.clientsP', compact('professionnel', 'rdvs'));
+    }
+
+
+    public function suiviP() {
+        $professionnel = Profession::findOrFail(auth('professionnel')->user()->id);
+
+        // Vous devez exécuter une requête pour obtenir les visiteurs associés à ce professionnel
+        $rdvs = RDV::where('profession_id', $professionnel->id)
+                    ->with('visiteur')
+                    ->get(); // Utilisez get() pour récupérer les résultats
+    
+        return view('professionnel.suiviP', compact('professionnel', 'rdvs'));
+    }
+
+    public function recherche_suivi_rdv_professionnel(Request $request) {
+        $professionnel = Profession::findOrFail(auth('professionnel')->user()->id);
+
+        $date_debut = $request->input('date_debut');
+        $date_fin = $request->input('date_fin');
+    
+        // Vous devez exécuter une requête pour obtenir les visiteurs associés à ce professionnel
+        $rdvs = RDV::where('profession_id', $professionnel->id)
+                    ->whereBetween('rdv.created_at', [$date_debut, $date_fin])
                     ->with('visiteur')
                     ->get(); // Utilisez get() pour récupérer les résultats
     

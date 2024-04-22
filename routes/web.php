@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ResetProfessionnelPasswordController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\Auth\ProfessionnelAuthController;
 use App\Http\Controllers\Auth\ProfessionnelRegisterController;
 use App\Http\Controllers\Auth\VisiteurLoginController;
@@ -12,6 +14,7 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\NoteController;
+
 
 
 /*
@@ -83,6 +86,36 @@ Route::get('admin.avis',
 Route::get('admin.infos', 
 [App\Http\Controllers\AdminController::class, 'infos'])
 ->name('infos');
+
+
+// RECHERCHE ENTRE DEUX DATES 
+
+Route::post('/professionnel/recherche', 
+[App\Http\Controllers\AdminController::class, 'recherche'])
+->name('professionnel.recherche');
+
+Route::post('/suivi_rdv/recherche', 
+[App\Http\Controllers\AdminController::class, 'recherche_rdv'])
+->name('suivi_rdv.recherche');
+
+Route::post('/client/recherche', 
+[App\Http\Controllers\AdminController::class, 'recherche_client'])
+->name('client.recherche');
+
+Route::post('/demande_rdv/recherche', 
+[App\Http\Controllers\AdminController::class, 'recherche_demande'])
+->name('demande_rdv.recherche');
+
+Route::post('/client_professionnel/recherche', 
+[App\Http\Controllers\ProfessionelController::class, 'recherche_client_professionnel'])
+->name('client_professionnel.recherche');
+
+Route::post('/suivi_rdv_professionnel/recherche', 
+[App\Http\Controllers\ProfessionelController::class, 'recherche_suivi_rdv_professionnel'])
+->name('suivi_rdv_professionnel.recherche');
+
+
+
 
 
 Route::get('admin.employe', 
@@ -238,6 +271,11 @@ Route::get('professionnel.suiviP',
 [App\Http\Controllers\ProfessionelController::class, 'suiviP'])
 ->name('suiviP');
 
+Route::delete('/supprimer-evenement/{id}', 
+[App\Http\Controllers\ProfessionelController::class, 'supprimerEvenement'])
+->name('supprimer_evenement');
+
+
 // Route pour mettre à jour le statut du rendez-vous
 
 // Rejeté
@@ -341,3 +379,32 @@ Route::post('/donner-note/{id}', [NoteController::class, 'store'])
 
 Route::get('/confirmation', [NoteController::class, 'confirmation'])
 ->name('page.de.confirmation');
+
+// REINITIALISE MOT DE PASSE 
+
+Route::get('password/reset/{token}', 
+[ResetPasswordController::class, 'showResetForm'])
+->name('password.reset');
+
+Route::post('password/reset', 
+[ResetPasswordController::class, 'reset'])
+->name('password.update');
+
+Route::get('password/resets_visiteurs', 
+[ResetPasswordController::class, 'showVisitorResetForm'])
+->name('password.reset.visiteur');
+
+Route::post('password/send-reset-link', 
+[ResetPasswordController::class, 'sendResetLinkEmail'])
+->name('password.sendResetLinkEmail');
+
+
+Route::get('password/resets_professionnels', 
+[ResetProfessionnelPasswordController::class, 'showVisitorResetForm'])
+->name('password.reset.professionnel');
+
+Route::post('password/send-reset-link-professionnel', 
+[ResetProfessionnelPasswordController::class, 'sendResetLinkEmailProfessionnel'])
+->name('password.sendResetLinkEmailProfessionnel');
+
+

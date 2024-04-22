@@ -272,77 +272,91 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var emplois = [
-                @foreach($emplois as $emploi)
-                    @php
-                        $startDateTime = $emploi->date_jour . ' ' . $emploi->heure_debut;
-                        $endDateTime = $emploi->date_jour . ' ' . $emploi->heure_fin;
-                        $description = \Carbon\Carbon::parse($startDateTime)->format('H\hi') . '-' . \Carbon\Carbon::parse($endDateTime)->format('H\hi');
-                    @endphp
-                    {
-                        start: '{{ \Carbon\Carbon::parse($startDateTime)->format('Y-m-d\TH:i:s') }}',
-                        end: '{{ \Carbon\Carbon::parse($endDateTime)->format('Y-m-d\TH:i:s') }}',
-                        description: '{{ $description }}',
-                        title: '{{ $emploi->titre }}',
-                    },
-                @endforeach
-            ];
+    var emplois = [
+        @foreach($emplois as $emploi)
+            @php
+                $startDateTime = $emploi->date_jour . ' ' . $emploi->heure_debut;
+                $endDateTime = $emploi->date_jour . ' ' . $emploi->heure_fin;
+                $description = \Carbon\Carbon::parse($startDateTime)->format('H\hi') . '-' . \Carbon\Carbon::parse($endDateTime)->format('H\hi');
+            @endphp
+            {
+                id: '{{ $emploi->id }}',
+                start: '{{ \Carbon\Carbon::parse($startDateTime)->format('Y-m-d\TH:i:s') }}',
+                end: '{{ \Carbon\Carbon::parse($endDateTime)->format('Y-m-d\TH:i:s') }}',
+                description: '{{ $description }}',
+                title: '{{ $emploi->titre }}',
+            },
+        @endforeach
+    ];
 
-            $('#calendar').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
-                },
-                events: emplois,
-                displayEventTime: true,
-                eventRender: function(event, element) {
-                    element.find('.fc-time').each(function() {
-                        if ($(this).hasClass('fc-start')) {
-                            $(this).find('.fc-time-text').remove();
-                        } else {
-                            $(this).text(event.description);
-                            $(this).before('<div class="fc-title">' + event.title + '</div>');
-                        }
-                    });
-                },
-                selectable: true,
-                selectHelper: true,
-                editable: true,
-                select: function(start, end, allDay) {
-                    $('#date_jour').val(start.format('YYYY-MM-DD'));
-                    $('#emploisModal').modal('toggle');
-                },
-                locale: 'fr',
-                dayRender: function(date, cell) {
-                    var today = date.format('YYYY-MM-DD');
-
-                    for (var i = 0; i < emplois.length; i++) {
-                        var event = emplois[i];
-                        if (today >= event.start && today <= event.end) {
-                            cell.css('border-bottom', '2px solid blue');
-                            break;
-                        }
-                    }
-                },
-            });
-
-            $('#emploiForm').submit(function(event) {
-                var heureDebut = $('#heure_debut').val();
-                var heureFin = $('#heure_fin').val();
-
-                if (heureFin < heureDebut) {
-                    event.preventDefault();
-                    alert('L\'heure de fin doit être supérieure ou égale à l\'heure de début.');
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        events: emplois,
+        displayEventTime: true,
+        eventRender: function(event, element) {
+            element.find('.fc-time').each(function() {
+                if ($(this).hasClass('fc-start')) {
+                    $(this).find('.fc-time-text').remove();
+                } else {
+                    $(this).text(event.description);
+                    $(this).before('<div class="fc-title">' + event.title + '</div>');
                 }
             });
-        });
+        },
+        selectable: true,
+        selectHelper: true,
+        editable: true,
+        select: function(start, end, allDay) {
+            $('#date_jour').val(start.format('YYYY-MM-DD'));
+            $('#emploisModal').modal('toggle');
+        },
+        locale: 'fr',
+        dayRender: function(date, cell) {
+            var today = date.format('YYYY-MM-DD');
+
+            for (var i = 0; i < emplois.length; i++) {
+                var event = emplois[i];
+                if (today >= event.start && today <= event.end) {
+                    cell.css('border-bottom', '2px solid blue');
+                    break;
+                }
+            }
+        },
+        eventClick: function(calEvent, jsEvent, view) {
+            if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
+                $.ajax({
+    url: '/supprimer-evenement/' + calEvent.id,
+    type: 'DELETE',
+    data: {
+        _token: '{{ csrf_token() }}'
+    },
+    success: function(response) {
+        $('#calendar').fullCalendar('removeEvents', calEvent.id);
+    },
+    error: function(xhr, status, error) {
+        alert('Erreur lors de la suppression de l\'événement.');
+    }
+});
+
+            }
+        }
+    });
+
+    $('#emploiForm').submit(function(event) {
+        var heureDebut = $('#heure_debut').val();
+        var heureFin = $('#heure_fin').val();
+
+        if (heureFin < heureDebut) {
+            event.preventDefault();
+            alert('L\'heure de fin doit être supérieure ou égale à l\'heure de début.');
+        }
+    });
+});
     </script>
-
-
-
-
-
 </body>
 
 </html>

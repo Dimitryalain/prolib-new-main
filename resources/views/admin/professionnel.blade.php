@@ -9,13 +9,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-   <title>Profession libérale</title>
+    <title>Profession libérale</title>
 
     <!-- Custom fonts for this template -->
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="../assets/css/sb-admin-2.min.css" rel="stylesheet">
@@ -52,13 +50,13 @@
                     <span>Tableau de Bord</span></a>
             </li>
 
-             <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link" href="{{route("demande")}}">
                     <i class="fas fa-swatchbook"></i>
                     <span>Demande de RDV</span></a>
             </li>
             @can("Administrateur")
-             <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link" href="{{route("audit")}}">
                     <i class="fas fa-eye"></i>
                     <span>Piste d'audit</span></a>
@@ -180,120 +178,135 @@
                     @endif
 
                 <!-- Begin Page Content -->
-<div class="container-fluid">
-    <!-- DataTales Example -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="m-0 font-weight-bold text-primary">Liste des professionnels</h6>
-                </div>
-                <div class="col-md-6 text-right">
-                    <a href="{{ route('generePDFProfessionnel') }}" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i
-                        class="fas fa-download fa-sm text-white-50"></i> Générer un rapport</a>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th style="width:20%;" class="text-center">Nom & Prénom</th>
-                            <th style="width:10%;" class="text-center">Adresse</th>
-                            <th style="width:10%;" class="text-center">E-mail</th>
-                            <th style="width:10%;" class="text-center">Profession</th>
-                            <th style="width:10%;" class="text-center">Téléphone</th>
-                            <th style="width:10%;" class="text-center">Etat</th>
-                            <th style="width:30%;" class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    @foreach ($professionnels as $professionnel)
-                        <tr>
-                            <td class="text-center">{{ $professionnel->nom }} {{ $professionnel->prenom }}</td>
-                            <td class="text-center">{{ $professionnel->adresse }}</td>
-                            <td class="text-center">{{ $professionnel->adresse_email }}</td>
-                            <td class="text-center">{{ $professionnel->profession }}</td>
-                            <td class="text-center">{{ $professionnel->telephone }}</td>
-                            <td class="text-center">
-                                @if ($professionnel->action =='0')
-                                    <label class="py-2 px-3 badge btn-danger" style="color:#fff;">Désactiver</label>
-                                @elseif ($professionnel->action =='1')
-                                    <label class="py-2 px-3 badge btn-success" style="color:#fff;">Activer</label>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#professionnelModal{{ $professionnel->id }}">
-                                    Voir plus
-                                </button>
-                                <a class="btn bg-success" href="{{ route('activate-professionnels', $professionnel->id) }}" class="btn btn-link" style="color:#fff;">Activer</a>
-                                <a class="btn bg-danger" href="{{ route('deactivate-professionnels', $professionnel->id) }}" class="btn btn-link" style="color:#fff;">Désactiver</a>
-                            </td>
-                        </tr>
+                <div class="container-fluid">
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="m-0 font-weight-bold text-primary">Liste des professionnels</h6>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <a href="{{ route('generePDFProfessionnel') }}" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Générer un rapport</a>
+                                </div>
+                            </div><br>
+                            <!-- Ajout des champs pour la date de début et la date de fin -->
+                            <form action="{{ route('professionnel.recherche') }}" method="POST">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label for="date_debut" class="col-md-4 col-form-label text-md-right">{{ __('Date de début') }}</label>
+                                            <div class="col-md-8">
+                                                <input id="date_debut" type="date" class="form-control" name="date_debut" required>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                        <!-- Modal pour ce professionnel spécifique -->
-                        <div class="modal fade" id="professionnelModal{{ $professionnel->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLongTitle">Détails du professionnel</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label for="date_fin" class="col-md-4 col-form-label text-md-right">{{ __('Date de fin') }}</label>
+                                            <div class="col-md-8">
+                                                <input id="date_fin" type="date" class="form-control" name="date_fin" required>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="modal-body">
-                                        <!-- Affichez les données du professionnel ici -->
-                                        <p><strong>Nom :</strong> {{ $professionnel->nom }}</p>
-                                        <p><strong>Prénom :</strong> {{ $professionnel->prenom }}</p>
-                                        <p><strong>Adresse :</strong> {{ $professionnel->adresse }}</p>
-                                        <p><strong>E-mail :</strong> {{ $professionnel->adresse_email }}</p>
-                                        <p><strong>Entreprise / Cabinet :</strong> {{ $professionnel->entreprise_cabinet }}</p>
-                                        <p><strong>Site web :</strong> {{ $professionnel->site_web }}</p>
-                                        <p><strong>Domaine d'expertise :</strong> {{ $professionnel->domaine_expertise }}</p>
-                                        <p><strong>Date de début d'exercice :</strong> {{ $professionnel->date_debut_exercice }}</p>
-                                        <p><strong>Education / Formation :</strong> {{ $professionnel->education_formation }}</p>
-                                        <p><strong>Téléphone :</strong> {{ $professionnel->telephone }}</p>
-                                        <p><strong>Profession :</strong> {{ $professionnel->profession }}</p>
-                                        <!-- Affichez des champs spécifiques en fonction de la profession -->
-                                            @if ($professionnel->profession === 'Avocat')
-                                                <p><strong>Spécialité juridique :</strong> {{ $professionnel->specialite_juridique }}</p>
-                                                <p><strong>Barreau :</strong> {{ $professionnel->barreau }}</p>
-                                                <p><strong>Numéro de licence d'avocat :</strong> {{ $professionnel->numero_licence_avocat }}</p>
-                                            @elseif ($professionnel->profession === 'Architecte')
-                                                <p><strong>Type de projets :</strong> {{ $professionnel->type_projets }}</p>
-                                                <p><strong>Numéro d'inscription à l'ordre des architectes :</strong> {{ $professionnel->numero_inscription_ordre_architectes }}</p>
-                                            @elseif ($professionnel->profession === 'Expert Comptable')
-                                                <p><strong>Services offerts :</strong> {{ $professionnel->services_offerts }}</p>
-                                                <p><strong>Numero agrement :</strong> {{ $professionnel->numero_agrement }}</p>
-                                            @elseif ($professionnel->profession === 'Géomètre')
-                                                <p><strong>Type de relevés :</strong> {{ $professionnel->type_releves }}</p>
-                                                <p><strong>Licence géomètre :</strong> {{ $professionnel->licence_geometre }}</p>
-                                            @elseif ($professionnel->profession === 'Coach')
-                                                <p><strong>Domaine de coaching :</strong> {{ $professionnel->domaine_coaching }}</p>
-                                                <p><strong>Certification coaching :</strong> {{ $professionnel->certification_coaching }}</p>
-                                            @elseif ($professionnel->profession === 'Ingenieur Conseil')
-                                                <p><strong>Domaine ingenierie :</strong> {{ $professionnel->domaine_ingenierie }}</p>
-                                                <p><strong>Certifications d'accreditations :</strong> {{ $professionnel->certifications_accreditations }}</p>
-                                            @elseif ($professionnel->profession === 'Notaire')
-                                                <p><strong>Spécialité notariale :</strong> {{ $professionnel->specialite_notariale }}</p>
-                                                <p><strong>Numero notaire :</strong> {{ $professionnel->numero_notaire }}</p>
-                                            @endif
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Fermer</button>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary">Rechercher</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            </form>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:20%;" class="text-center">Nom & Prénom</th>
+                                            <th style="width:10%;" class="text-center">Adresse</th>
+                                            <th style="width:10%;" class="text-center">E-mail</th>
+                                            <th style="width:10%;" class="text-center">Profession</th>
+                                            <th style="width:10%;" class="text-center">Téléphone</th>
+                                            <th style="width:10%;" class="text-center">Etat</th>
+                                            <th style="width:30%;" class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($professionnels as $professionnel)
+                                            <tr>
+                                                <td class="text-center">{{ $professionnel->nom }} {{ $professionnel->prenom }}</td>
+                                                <td class="text-center">{{ $professionnel->adresse }}</td>
+                                                <td class="text-center">{{ $professionnel->adresse_email }}</td>
+                                                <td class="text-center">{{ $professionnel->profession }}</td>
+                                                <td class="text-center">{{ $professionnel->telephone }}</td>
+                                                <td class="text-center">
+                                                    @if ($professionnel->action =='0')
+                                                        <label class="py-2 px-3 badge btn-danger" style="color:#fff;">Désactiver</label>
+                                                    @elseif ($professionnel->action =='1')
+                                                        <label class="py-2 px-3 badge btn-success" style="color:#fff;">Activer</label>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#professionnelModal{{ $professionnel->id }}">
+                                                        Voir plus
+                                                    </button>
+                                                    <a class="btn bg-success" href="{{ route('activate-professionnels', $professionnel->id) }}" class="btn btn-link" style="color:#fff;">Activer</a>
+                                                    <a class="btn bg-danger" href="{{ route('deactivate-professionnels', $professionnel->id) }}" class="btn btn-link" style="color:#fff;">Désactiver</a>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Modal pour ce professionnel spécifique -->
+                                            <div class="modal fade" id="professionnelModal{{ $professionnel->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle">Détails du professionnel</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <!-- Affichez les données du professionnel ici -->
+                                                            <p><strong>Nom :</strong> {{ $professionnel->nom }}</p>
+                                                            <p><strong>Prénom :</strong> {{ $professionnel->prenom }}</p>
+                                                            <p><strong>Adresse :</strong> {{ $professionnel->adresse }}</p>
+                                                            <p><strong>E-mail :</strong> {{ $professionnel->adresse_email }}</p>
+                                                            <p><strong>Entreprise / Cabinet :</strong> {{ $professionnel->entreprise_cabinet }}</p>
+                                                            <p><strong>Site web :</strong> {{ $professionnel->site_web }}</p>
+                                                            <p><strong>Domaine d'expertise :</strong> {{ $professionnel->domaine_expertise }}</p>
+                                                            <p><strong>Date de début d'exercice :</strong> {{ $professionnel->date_debut_exercice }}</p>
+                                                            <p><strong>Education / Formation :</strong> {{ $professionnel->education_formation }}</p>
+                                                            <p><strong>Téléphone :</strong> {{ $professionnel->telephone }}</p>
+                                                            <p><strong>Profession :</strong> {{ $professionnel->profession }}</p>
+                                                            <!-- Affichez des champs spécifiques en fonction de la profession -->
+                                                                @if ($professionnel->profession === 'Avocat')
+                                                                    <p><strong>Spécialisation :</strong> {{ $professionnel->specialisation }}</p>
+                                                                    <p><strong>Barreau :</strong> {{ $professionnel->barreau }}</p>
+                                                                @elseif ($professionnel->profession === 'Médecin')
+                                                                    <p><strong>Spécialité :</strong> {{ $professionnel->specialite }}</p>
+                                                                    <p><strong>Numéro d'inscription :</strong> {{ $professionnel->numero_inscription }}</p>
+                                                                @endif
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    @endforeach
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+                    </div>
 
-
-
+                </div>
                 <!-- /.container-fluid -->
 
             </div>
@@ -302,8 +315,8 @@
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Tous les droits sont réservés &copy; e-thik 2023</span>
+                    <div class="text-center my-auto">
+                        <span>© 2022 Profession libérale</span>
                     </div>
                 </div>
             </footer>
@@ -321,20 +334,19 @@
     </a>
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Prêt à partir ?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-body">Sélectionnez "Déconnexion" ci-dessous si vous êtes prêt à mettre fin à votre session en cours.</div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                    <a class="btn btn-primary" href="login.html">Déconnexion</a>
                 </div>
             </div>
         </div>

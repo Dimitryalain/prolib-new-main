@@ -3,12 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Profession extends Authenticatable
+
+class Profession extends Authenticatable implements CanResetPasswordContract
 {
+    use HasFactory, Notifiable, CanResetPasswordTrait; 
+
     // Indiquez les attributs fillable (attributs pouvant être massivement attribués)
     protected $fillable = [
         'nom',
@@ -23,10 +29,10 @@ class Profession extends Authenticatable
         'profession',
         'telephone',
         'password',
-        'description',
+        'details',
     ];
 
-    protected $table ="professions";
+    protected $table = "professions";
 
     public static function CountProfessionnels()
     {

@@ -27,6 +27,19 @@ class AdminController extends Controller
         return view('admin.clients',compact('user','visiteurs'));
     }
 
+    public function recherche_client(Request $request)
+    {
+        $date_debut = $request->input('date_debut');
+        $date_fin = $request->input('date_fin');
+    
+        // Utilisez la méthode whereBetween pour filtrer les rendez-vous entre deux dates
+        $visiteurs = Visiteur::whereBetween('visiteurs.created_at', [$date_debut, $date_fin])->get();
+        $user = User::findOrFail(auth()->user()->id);
+    
+        return view('admin.clients', compact('visiteurs', 'user'));
+    }
+
+
  // Contrôleur
 public function tdb()
     {
@@ -99,6 +112,18 @@ public function tdb()
         return view('admin.demande',compact('user','rdvs'));
     }
 
+    public function recherche_demande(Request $request)
+    {
+        $date_debut = $request->input('date_debut');
+        $date_fin = $request->input('date_fin');
+    
+        // Utilisez la méthode whereBetween pour filtrer les rendez-vous entre deux dates
+        $rdvs = RDV::whereBetween('date_reservation', [$date_debut, $date_fin])->get();
+        $user = User::findOrFail(auth()->user()->id);
+    
+        return view('admin.demande', compact('rdvs', 'user'));
+    }
+
     public function notations(){
         $rdvs = RDV::all();
         $user = User::findOrFail(auth()->user()->id);
@@ -125,6 +150,20 @@ public function tdb()
         $user = User::findOrFail(auth()->user()->id);
         return view('admin.suivi',compact('user','rdvs'));
     }
+
+    public function recherche_rdv(Request $request)
+    {
+        $date_debut = $request->input('date_debut');
+        $date_fin = $request->input('date_fin');
+    
+        // Utilisez la méthode whereBetween pour filtrer les rendez-vous entre deux dates
+        $rdvs = RDV::whereBetween('date_reservation', [$date_debut, $date_fin])->get();
+        $user = User::findOrFail(auth()->user()->id);
+    
+        return view('admin.suivi', compact('rdvs', 'user'));
+    }
+    
+
 
     public function professionnel()
 {
@@ -161,6 +200,47 @@ public function tdb()
 
     return view('admin.professionnel', compact('user', 'professionnels'));
 }
+
+public function recherche(Request $request)
+{
+    $user = User::findOrFail(auth()->user()->id);
+    $date_debut = $request->input('date_debut');
+    $date_fin = $request->input('date_fin');
+
+    // Récupérez les données de toutes les professions avec des jointures
+    $professionnels = DB::table('professions')
+        ->leftJoin('avocats', 'professions.id', '=', 'avocats.profession_id')
+        ->leftJoin('architectes', 'professions.id', '=', 'architectes.profession_id')
+        ->leftJoin('expert_comptables', 'professions.id', '=', 'expert_comptables.profession_id')
+        ->leftJoin('geometres', 'professions.id', '=', 'geometres.profession_id')
+        ->leftJoin('coachs', 'professions.id', '=', 'coachs.profession_id')
+        ->leftJoin('ingenieurs_conseils', 'professions.id', '=', 'ingenieurs_conseils.profession_id')
+        ->leftJoin('notaires', 'professions.id', '=', 'notaires.profession_id')
+        ->select(
+            'professions.*', // Sélectionnez tous les champs de la table professions
+            'avocats.specialite_juridique',
+            'avocats.barreau',
+            'avocats.numero_licence_avocat',
+            'architectes.type_projets',
+            'architectes.numero_inscription_ordre_architectes',
+            'expert_comptables.services_offerts',
+            'expert_comptables.numero_agrement',
+            'geometres.type_releves',
+            'geometres.licence_geometre',
+            'coachs.domaine_coaching',
+            'coachs.certification_coaching',
+            'ingenieurs_conseils.domaine_ingenierie',
+            'ingenieurs_conseils.certifications_accreditations',
+            'notaires.specialite_notariale',
+            'notaires.numero_notaire'
+        )
+        ->whereBetween('professions.created_at', [$date_debut, $date_fin])
+        ->get();
+
+    // Passez les résultats filtrés à la vue pour affichage.
+    return view('admin.professionnel', compact('user', 'professionnels'));
+}
+
 
 
     public function employe(){

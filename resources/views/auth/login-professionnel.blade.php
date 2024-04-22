@@ -42,17 +42,22 @@
                                 </div>
                                 <br>
 
-                                <div class="form-group row mb-0">
-                                    <div class="col-md-8 offset-md-4">
+                                <div class="form-group row">
+                                    <div class="col-md-6 offset-md-4">
                                         <button type="submit" class="btn btn-primary" style="background-color: #0c2646;">
                                             {{ __('Connexion') }}
                                         </button>
                                     </div>
                                 </div>
                             </form>
-                        </center><br>
-                        <center><a href="{{ route('register-professionnel') }}">Créer un compte Profession libérale</a></center>
-                        
+                        </center>
+                        <div style="margin-top: 10px;">
+                            <center>
+                                <a href="{{ route('password.reset.professionnel') }}" style="text-decoration: none;">Mot de passe oublié ?</a> <!-- Lien "Mot de passe oublié ?" -->
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="{{ route('register-professionnel') }}" style="text-decoration: none;">Créer un compte</a>
+                            </center>
+                        </div>
                     </div>
                 </div>
             </div>

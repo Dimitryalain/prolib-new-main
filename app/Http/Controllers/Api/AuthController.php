@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CustomResetPasswordEmail;
+use Illuminate\Support\Str;
+
 
 
 
@@ -366,4 +371,35 @@ public function updateCreneauStatus(Request $request)
         }
     }
 
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $visiteur = Visiteur::where('email', $request->email)->first();
+
+        if (!$visiteur) {
+            return response()->json(['error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        // Générez un token de réinitialisation de mot de passe
+        $token = Str::random(60); // Utilisation de Str::random() au lieu de str_random()
+
+        // Enregistrez le token dans votre base de données
+        DB::table('password_resets_visiteurs')->insert([
+            'email' => $visiteur->email,
+            'token' => $token,
+            'created_at' => now(),
+        ]);
+
+        // Envoyez l'email personnalisé
+        Mail::to($visiteur->email)->send(new CustomResetPasswordEmail($visiteur, $token));
+
+        return response()->json(['message' => 'Email de réinitialisation de mot de passe envoyé avec succès']);
+    }
+    
+    
+    
 }

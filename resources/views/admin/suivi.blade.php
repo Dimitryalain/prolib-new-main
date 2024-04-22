@@ -182,8 +182,41 @@
                                         <i class="fas fa-download fa-sm text-white-50"></i> Générer un rapport
                                     </a>
                                 </div>
+                            </div><br>
 
-                            </div>
+                             <!-- Ajout des champs pour la date de début et la date de fin -->
+                             <form action="{{ route('suivi_rdv.recherche') }}" method="POST">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label for="date_debut" class="col-md-4 col-form-label text-md-right">{{ __('Date de début') }}</label>
+                                            <div class="col-md-8">
+                                                <input id="date_debut" type="date" class="form-control" name="date_debut" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <label for="date_fin" class="col-md-4 col-form-label text-md-right">{{ __('Date de fin') }}</label>
+                                            <div class="col-md-8">
+                                                <input id="date_fin" type="date" class="form-control" name="date_fin" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group row">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary">Rechercher</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+
                     </div>
                         <div class="card-body">
                             <div class="table-responsive">

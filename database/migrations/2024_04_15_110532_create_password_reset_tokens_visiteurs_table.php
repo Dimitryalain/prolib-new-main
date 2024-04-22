@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('professions', function (Blueprint $table) {
-            $table->string('description');
+        Schema::create('password_reset_tokens_visiteurs', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->index();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('professions', function (Blueprint $table) {
-            $table->dropColumn(['description']);
-        });
+        Schema::dropIfExists('password_reset_tokens_visiteurs');
     }
 };

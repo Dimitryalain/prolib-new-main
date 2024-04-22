@@ -48,8 +48,12 @@
                                         </button>
                                     </div>
                                 </div>
-                            </form>
-                            <a href="{{ route('register-visiteur') }}">Créer un compte</a>
+                            </form> 
+                            <div style="margin-top: 10px;">
+                                <a href="{{ route('password.reset.visiteur') }}" style="text-decoration: none;">Mot de passe oublié ?</a> <!-- Lien "Mot de passe oublié ?" -->
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="{{ route('register-visiteur') }}" style="text-decoration: none;">Créer un compte</a>
+                            </div>
                         </center>
                     </div>
                 </div>

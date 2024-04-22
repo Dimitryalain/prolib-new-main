@@ -113,11 +113,24 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => 'password_reset_tokens',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'visiteurs' => [
+            'provider' => 'visiteurs',
+            'table' => 'password_resets_visiteurs',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'professions' => [
+            'provider' => 'professions',
+            'table' => 'password_resets_professions',
             'expire' => 60,
             'throttle' => 60,
         ],
     ],
+    
 
     /*
     |--------------------------------------------------------------------------

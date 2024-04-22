@@ -67,7 +67,7 @@ class ProfessionnelRegisterController extends Controller
             'profession' => 'required|string',
             'telephone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'description' => 'required|string',
+            
         ]);
 
         $professionnel = Profession::create([
@@ -83,7 +83,7 @@ class ProfessionnelRegisterController extends Controller
             'profession' => $request->profession,
             'telephone' => $request->telephone,
             'password' => Hash::make($request->password),
-            'description' => $request->description,
+           
         ]);
 
         return redirect()->back()->with('success', 'Votre compte à été crée avec succès.');

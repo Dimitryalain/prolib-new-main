@@ -39,3 +39,5 @@ Route::get('/creneaux-horaires/{professionId}', [AuthController::class, 'getCren
 Route::get('/visiteurs', [AuthController::class, 'getVisiteurs']);
 Route::post('/auth/rdv/create', [AuthController::class, 'createRDV']);
 Route::put('/update-creneau-status', [AuthController::class, 'updateCreneauStatus']);
+
+Route::post('password/reset', [AuthController::class, 'resetPassword']);
